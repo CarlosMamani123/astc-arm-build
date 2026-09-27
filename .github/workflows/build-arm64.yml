@@ -29,16 +29,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service:
-          - name: assistance
+        include:
+          - service: assistance
             image: assistance-service
-          - name: auth
+          - service: auth
             image: auth-service
-          - name: backoffice
+          - service: backoffice
             image: backoffice-service
-          - name: project-assistance
+          - service: project-assistance
             image: project-assistance-service
-          - name: astc-cn-notifications
+          - service: astc-cn-notifications
             image: cn-notifications
 
     steps:
