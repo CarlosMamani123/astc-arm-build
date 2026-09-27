@@ -1,0 +1,38 @@
+meta {
+  name: listAttendance
+  type: graphql
+  seq: 2
+}
+
+post {
+  url: {{base_url}}
+  body: graphql
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt_token}}
+}
+
+body:graphql {
+  query {
+    listAttendance(filter: { from: "2025-01-01", to: "2025-12-31", page: 0, size: 10 }) {
+      items {
+        id
+        date
+        checkIn
+        checkOut
+        status
+        latitude
+        longitude
+        photoUrl
+      }
+      pageInfo {
+        totalItems
+        page
+        size
+        totalPages
+      }
+    }
+  }
+}

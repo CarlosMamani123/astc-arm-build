@@ -1,0 +1,28 @@
+meta {
+  name: justifyAbsence
+  type: graphql
+  seq: 2
+}
+
+post {
+  url: {{base_url}}
+  body: graphql
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt_token}}
+}
+
+body:graphql {
+  mutation {
+    justifyAbsence(input: {
+      absenceId: "REPLACE_WITH_ABSENCE_UUID"
+    }) {
+      id
+      date
+      type
+      justified
+    }
+  }
+}

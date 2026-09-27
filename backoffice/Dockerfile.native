@@ -1,0 +1,18 @@
+FROM quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-21 AS build
+
+WORKDIR /app
+
+COPY pom.xml .
+COPY src ./src
+
+RUN mvn clean package -Pnative -DskipTests
+
+FROM quay.io/quarkus/quarkus-micro-image:2.0
+
+WORKDIR /app
+
+COPY --from=build /app/target/*-runner /app/application
+
+EXPOSE 8082
+
+ENTRYPOINT ["./application"]

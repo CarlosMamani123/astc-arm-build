@@ -1,0 +1,10 @@
+# Forzar LF en el checkout. Sin esto, los Dockerfiles llegan al runner ARM con
+# CRLF y las continuaciones de linea con "\" dejan de funcionar.
+* text=auto eol=lf
+
+Dockerfile
+*.sh
+*.yml
+*.xml
+*.properties
+*.java

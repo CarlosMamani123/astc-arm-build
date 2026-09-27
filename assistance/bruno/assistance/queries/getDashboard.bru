@@ -1,0 +1,37 @@
+meta {
+  name: getDashboard
+  type: graphql
+  seq: 1
+}
+
+post {
+  url: {{base_url}}
+  body: graphql
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt_token}}
+}
+
+body:graphql {
+  query {
+    getDashboard {
+      totalAttendances
+      totalAbsences
+      totalJustifications
+      recentAttendances {
+        id
+        date
+        checkIn
+        checkOut
+        status
+      }
+      recentJustifications {
+        id
+        status
+        submittedAt
+      }
+    }
+  }
+}

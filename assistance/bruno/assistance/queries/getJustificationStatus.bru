@@ -1,0 +1,27 @@
+meta {
+  name: getJustificationStatus
+  type: graphql
+  seq: 5
+}
+
+post {
+  url: {{base_url}}
+  body: graphql
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt_token}}
+}
+
+body:graphql {
+  query {
+    getJustificationStatus(justificationId: "REPLACE_WITH_JUSTIFICATION_UUID") {
+      id
+      status
+      comment
+      reviewedAt
+      reviewedBy
+    }
+  }
+}

@@ -1,0 +1,33 @@
+meta {
+  name: registerAttendance
+  type: graphql
+  seq: 1
+}
+
+post {
+  url: {{base_url}}
+  body: graphql
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt_token}}
+}
+
+body:graphql {
+  mutation {
+    registerAttendance(input: {
+      date: "2025-04-15"
+      checkIn: "08:00"
+      projectId: "00000000-0000-0000-0000-000000000001"
+      latitude: -12.0464
+      longitude: -77.0428
+    }) {
+      id
+      date
+      checkIn
+      status
+      photoUrl
+    }
+  }
+}

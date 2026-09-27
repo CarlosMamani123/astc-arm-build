@@ -1,0 +1,30 @@
+meta {
+  name: saveJustification
+  type: graphql
+  seq: 3
+}
+
+post {
+  url: {{base_url}}
+  body: graphql
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt_token}}
+}
+
+body:graphql {
+  mutation {
+    saveJustification(input: {
+      absenceId: "REPLACE_WITH_ABSENCE_UUID"
+      description: "Medical leave - doctor appointment"
+    }) {
+      id
+      absenceId
+      description
+      status
+      submittedAt
+    }
+  }
+}

@@ -1,0 +1,36 @@
+meta {
+  name: listJustifications
+  type: graphql
+  seq: 4
+}
+
+post {
+  url: {{base_url}}
+  body: graphql
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt_token}}
+}
+
+body:graphql {
+  query {
+    listJustifications(filter: { status: "PENDING", page: 0, size: 10 }) {
+      items {
+        id
+        absenceId
+        description
+        documentUrl
+        status
+        submittedAt
+      }
+      pageInfo {
+        totalItems
+        page
+        size
+        totalPages
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+# Secretos: nunca subirlos. Solo los .env.example van al repo.
+.env
+.env.*
+!.env.example
+
+# Build output
+target/
+.next/
+dist/
+.quarkus/
+node_modules/
+*.jar
+*.tar
+*.log
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Git anidado: los servicios venian como repos independientes
+.git

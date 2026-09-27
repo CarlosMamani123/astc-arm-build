@@ -1,0 +1,15 @@
+post {
+  url: {{url}}
+  body: graphql
+}
+
+body {
+  query {
+    ListUsers {
+      id
+      username
+      email
+      phone
+    }
+  }
+}

@@ -1,0 +1,32 @@
+meta {
+  name: Login
+  type: graphql
+  seq: 1
+}
+
+request {
+  url: {{BASE_URL_AUTH}}
+  method: POST
+  body: graphql
+}
+
+body:graphql {
+  mutation {
+    login(email: "alan@test.com", password: "123456")
+  }
+}
+
+vars:json {
+  BASE_URL_AUTH: http://localhost:8081/graphql
+}
+
+script:post-response {
+  const token = res.body.data.login;
+
+  if (token) {
+    bru.setEnvVar("TOKEN", token);
+    console.log("✅ TOKEN guardado");
+  } else {
+    console.log("❌ No se recibió token");
+  }
+}
