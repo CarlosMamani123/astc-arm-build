@@ -17,7 +17,6 @@ import org.jboss.logging.Logger;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 @ApplicationScoped
@@ -52,7 +51,7 @@ public class EmailNotificationConsumer {
             if (exceedsMaxRetries(raw)) {
                 LOG.errorf("💀 [Consumer] Message exceeded max retries (%d), parking for manual review", maxRetries);
                 parkingEmitter.send(body);
-                return CompletableFuture.completedFuture(null);
+                return acknowledge(raw);
             }
 
             JsonObject payload = new JsonObject(body);
@@ -65,7 +64,7 @@ public class EmailNotificationConsumer {
                     notificationMessage.setToEmail("user-" + notificationMessage.getUserId() + "@astc.local");
                 } else {
                     LOG.warnf("Skipping message with empty toEmail and empty userId: code=%s", notificationMessage.getNotificationCode());
-                    return CompletableFuture.completedFuture(null);
+                    return acknowledge(raw);
                 }
             }
 
@@ -83,15 +82,32 @@ public class EmailNotificationConsumer {
                 parkingEmitter.send(body);
             }
 
-            return CompletableFuture.completedFuture(null);
+            return acknowledge(raw);
 
         } catch (Exception e) {
             LOG.errorf(e, "Error processing email notification, moving to parking queue: %s", e.getMessage());
             if (body != null) {
                 parkingEmitter.send(body);
             }
-            return CompletableFuture.completedFuture(null);
+            return acknowledge(raw);
         }
+    }
+
+    /**
+     * Confirma la recepcion del mensaje en RabbitMQ de forma explicita.
+     *
+     * <p>Devolver {@code CompletableFuture.completedFuture(null)} desde el consumidor NO alcanza:
+     * el mensaje queda {@code unacked} para siempre y RabbitMQ lo reentrega cada 30 minutos
+     * (consumer timeout), duplicando el correo. El ACK explicito es obligatorio.</p>
+     */
+    private CompletionStage<Void> acknowledge(Message<Object> raw) {
+        return raw.ack().whenComplete((ignored, error) -> {
+            if (error != null) {
+                LOG.errorf(error, "[Consumer] ACK explicito FALLIDO: %s", error.getMessage());
+            } else {
+                LOG.info("[Consumer] ACK explicito OK");
+            }
+        });
     }
 
     private boolean exceedsMaxRetries(Message<Object> message) {
