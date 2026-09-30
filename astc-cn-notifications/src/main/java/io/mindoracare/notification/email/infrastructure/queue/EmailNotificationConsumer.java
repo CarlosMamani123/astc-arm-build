@@ -38,8 +38,8 @@ public class EmailNotificationConsumer {
     @Incoming("email-notification-in")
     @Blocking
     public CompletionStage<Void> consume(Message<Object> raw) {
+        String body;
         try {
-            String body;
             Object payloadRaw = raw.getPayload();
             if (payloadRaw instanceof byte[]) {
                 body = new String((byte[]) payloadRaw, StandardCharsets.UTF_8);
@@ -78,17 +78,19 @@ public class EmailNotificationConsumer {
                 LOG.infof("Email notification sent: code=%s to=%s",
                         notificationMessage.getNotificationCode(), notificationMessage.getToEmail());
             } else {
-                LOG.errorf("Email notification send returned false: code=%s to=%s",
+                LOG.errorf("Email notification send FAILED, moving to parking queue for manual review: code=%s to=%s",
                         notificationMessage.getNotificationCode(), notificationMessage.getToEmail());
-                return CompletableFuture.failedFuture(
-                        new RuntimeException("Send returned false for: " + notificationMessage.getNotificationCode()));
+                parkingEmitter.send(body);
             }
 
             return CompletableFuture.completedFuture(null);
 
         } catch (Exception e) {
-            LOG.errorf(e, "Error processing email notification: %s", e.getMessage());
-            return CompletableFuture.failedFuture(e);
+            LOG.errorf(e, "Error processing email notification, moving to parking queue: %s", e.getMessage());
+            if (body != null) {
+                parkingEmitter.send(body);
+            }
+            return CompletableFuture.completedFuture(null);
         }
     }
 
