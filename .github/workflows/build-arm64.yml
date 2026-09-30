@@ -71,3 +71,22 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/astc-arm-build/${{ matrix.image }}:latest
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+
+      # El paquete GHCR es privado y los nodos ARM del cluster no pueden
+      # autenticarse, asi que ademas de publicar en GHCR se exporta un tar
+      # como artefacto para importarlo con `ctr images import` en el nodo.
+      - name: Exportar tar de la imagen (notifications)
+        if: matrix.service == 'astc-cn-notifications'
+        run: |
+          IMG="ghcr.io/${{ env.IMAGE_PREFIX }}/astc-arm-build/${{ matrix.image }}:latest"
+          docker pull "$IMG"
+          docker save "$IMG" | gzip -1 > cn-notifications-arm64.tar.gz
+          ls -lh cn-notifications-arm64.tar.gz
+
+      - name: Subir artefacto
+        if: matrix.service == 'astc-cn-notifications'
+        uses: actions/upload-artifact@v4
+        with:
+          name: cn-notifications-arm64
+          path: cn-notifications-arm64.tar.gz
+          retention-days: 7
