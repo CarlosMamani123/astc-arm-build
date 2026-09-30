@@ -38,7 +38,7 @@ public class EmailNotificationConsumer {
     @Incoming("email-notification-in")
     @Blocking
     public CompletionStage<Void> consume(Message<Object> raw) {
-        String body;
+        String body = null;
         try {
             Object payloadRaw = raw.getPayload();
             if (payloadRaw instanceof byte[]) {
